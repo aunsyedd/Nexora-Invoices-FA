@@ -38,6 +38,7 @@ export default function ZatcaQRCodeDisplay({
           invoiceDate,
           totalAmount,
           vatAmount
+          
         ),
         error: null as string | null,
       };

@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
@@ -117,6 +116,12 @@ export default function NewInvoicePage({
   // Editing state
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editItem, setEditItem] = useState<LineItem | null>(null);
+
+  // ── VALIDATION STATE ─────────────────────────────────────
+  // Controls whether the ZATCA QR code is shown in the Amount
+  // section and included in the printed invoice.
+  const [isValidated, setIsValidated] = useState(false);
+  // ────────────────────────────────────────────────────────
 
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState("");
@@ -623,19 +628,23 @@ export default function NewInvoicePage({
                   </div>
                 ))}
 
-                <div className="border-t border-gray-300 pt-3 mt-2">
-                  <div className="flex justify-end">
-                    <ZatcaQRCodeDisplay
-                      sellerName={SELLER_COMPANY.name}
-                      vatNumber={SELLER_COMPANY.vatId}
-                      invoiceDate={date}
-                      totalAmount={netAmount}
-                      vatAmount={vatAmount}
-                      size={120}
-                      showLabel
-                    />
+                {/* ── ZATCA QR — only shown when validated ── */}
+                {isValidated && (
+                  <div className="border-t border-gray-300 pt-3 mt-2">
+                    <div className="flex justify-end">
+                      <ZatcaQRCodeDisplay
+                        sellerName={SELLER_COMPANY.name}
+                        vatNumber={SELLER_COMPANY.vatId}
+                        invoiceDate={date}
+                        totalAmount={netAmount}
+                        vatAmount={vatAmount}
+                        size={120}
+                        showLabel
+                      />
+                    </div>
                   </div>
-                </div>
+                )}
+                {/* ───────────────────────────────────────── */}
               </div>
             </div>
           </div>
@@ -792,21 +801,70 @@ export default function NewInvoicePage({
             </div>
           )}
 
-          {/* Bottom Action Buttons */}
+          {/* ── Bottom Action Buttons ── */}
           <div className="flex flex-wrap gap-3 py-2">
-            <button onClick={handleSave} disabled={saving} className="bg-blue-600 text-white px-6 py-2 rounded text-sm font-medium shadow-sm hover:bg-blue-700 disabled:opacity-60 transition-colors">
+            {/* Save / Update */}
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="bg-blue-600 text-white px-6 py-2 rounded text-sm font-medium shadow-sm hover:bg-blue-700 disabled:opacity-60 transition-colors"
+            >
               {saving ? "Saving..." : mode === "edit" ? "Update Invoice" : "Save Invoice"}
             </button>
-            <button onClick={() => handlePrintProforma()} className="bg-white text-blue-600 border border-blue-600 px-6 py-2 rounded text-sm font-medium shadow-sm hover:bg-blue-50 transition-colors">
+
+            {/* Print Invoice */}
+            <button
+              onClick={() => handlePrintProforma()}
+              className="bg-white text-blue-600 border border-blue-600 px-6 py-2 rounded text-sm font-medium shadow-sm hover:bg-blue-50 transition-colors"
+            >
               Print Invoice
             </button>
+
+            {/*
+             * ── VALIDATE / INVALIDATE TOGGLE ──────────────────────────
+             * Validate  → green button: sets isValidated = true
+             *             shows QR in Amount section + printed invoice
+             * Invalidate → red button: sets isValidated = false
+             *             hides QR from Amount section + printed invoice
+             * ──────────────────────────────────────────────────────────
+             */}
+            {!isValidated ? (
+              <button
+                onClick={() => setIsValidated(true)}
+                className="bg-green-600 text-white px-6 py-2 rounded text-sm font-medium shadow-sm hover:bg-green-700 transition-colors"
+              >
+                Validate
+              </button>
+            ) : (
+              <button
+                onClick={() => setIsValidated(false)}
+                className="bg-red-600 text-white px-6 py-2 rounded text-sm font-medium shadow-sm hover:bg-red-700 transition-colors"
+              >
+                Invalidate
+              </button>
+            )}
           </div>
+
+          {/* Validation status badge */}
+          {isValidated && (
+            <div className="flex items-center gap-2 text-xs font-medium text-green-700 bg-green-50 border border-green-200 px-3 py-2 rounded w-fit">
+              <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
+              Invoice validated — QR code is active and will appear on the printed invoice.
+            </div>
+          )}
 
         </div>
       </main>
 
+      {/*
+       * Hidden print target.
+       * `showQr={isValidated}` tells ProformaInvoicePrint whether to
+       * render the ZatcaQRCodeDisplay inside the printed document.
+       * Make sure your ProformaInvoicePrint component accepts and
+       * respects the `showQr` prop (see note below).
+       */}
       <div aria-hidden style={{ position: "fixed", left: "-10000px", top: 0, zIndex: -1 }}>
-        <ProformaInvoicePrint
+        <ProformaInvoicePrint 
           ref={printRef}
           variant="tax"
           data={{
@@ -827,6 +885,7 @@ export default function NewInvoicePage({
             lineItems,
             customer: selectedCustomer || (customerName ? { name: customerName } : null),
           }}
+          showQr={isValidated}
         />
       </div>
     </div>

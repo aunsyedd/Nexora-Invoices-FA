@@ -23,6 +23,7 @@ export interface ProformaCustomer {
   city?: string;
   vat_no?: string;
   other_id?: string;
+
 }
 
 export interface ProformaLineItem {
@@ -56,6 +57,7 @@ export interface ProformaInvoiceData {
 
 interface ProformaInvoicePrintProps {
   data: ProformaInvoiceData;
+   showQr?: boolean;   // ✅ ADD THIS
   variant?: "tax" | "proforma";
 }
 
@@ -197,7 +199,7 @@ function PartyColumn({
 export const ProformaInvoicePrint = React.forwardRef<
   HTMLDivElement,
   ProformaInvoicePrintProps
->(function ProformaInvoicePrint({ data, variant = "tax" }, ref) {
+>(function ProformaInvoicePrint({ data, variant = "tax" ,showQr = true }, ref) {
   const seller = SELLER_COMPANY;
   const buyer = data.customer || {};
   const dueDate = getDueDate(data.date, data.paymentTerms);
@@ -405,7 +407,7 @@ export const ProformaInvoicePrint = React.forwardRef<
           align-items: flex-end;
 
           padding-top: 8px;
-          margin-top: 252px;
+          margin-top: 22px;
           min-height: 48px;
         }
 
@@ -495,16 +497,18 @@ export const ProformaInvoicePrint = React.forwardRef<
           </tbody>
         </table>
 
-        <div className="header-qr">
-          <ZatcaQRCodeDisplay
-            sellerName={seller.name}
-            vatNumber={seller.vatId}
-            invoiceDate={data.date}
-            totalAmount={data.netAmount}
-            vatAmount={data.vatAmount}
-            size={88}
-          />
-        </div>
+<div className="header-qr">
+  {showQr && (
+    <ZatcaQRCodeDisplay
+      sellerName={seller.name}
+      vatNumber={seller.vatId}
+      invoiceDate={data.date}
+      totalAmount={data.netAmount}
+      vatAmount={data.vatAmount}
+      size={88}
+    />
+  )}
+</div>
       </div>
 
       <div className="parties-row">
