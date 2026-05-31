@@ -57,7 +57,7 @@ export default function Navbar() {
             className="rounded object-cover"
           />
           <div className="flex flex-col leading-tight">
-            <span className="text-xs font-medium text-gray-500">Nexora Invoices</span>
+           <span className="text-xs font-medium text-gray-500">Nexora Invoicing Software</span>
             <span className="text-lg font-semibold text-gray-800">WTMC</span>
           </div>
         </button>
