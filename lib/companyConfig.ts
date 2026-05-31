@@ -1,0 +1,15 @@
+export const SELLER_COMPANY = {
+  name: "WASHIKA TABASSUM MARWAH Co.",
+  nameAr: "شركة واشيكا تا باسوم مارواه",
+  buildingNo: "2954",
+  street: "Ash Sharam",
+  streetAr: "الشرم",
+  district: "Al Fayha Dist.",
+  districtAr: "الفيحاء",
+  secondNo: "8839",
+  postalCode: "22241",
+  city: "Jeddah",
+  cityAr: "جدة",
+  vatId: "314373744200003",
+  otherId: "7052441909",
+};
