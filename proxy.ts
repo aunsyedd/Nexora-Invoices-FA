@@ -1,14 +1,15 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { updateSession } from "@/lib/supabase/proxy";
+import { isPublicPath, updateSession } from "@/lib/supabase/proxy";
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const isPublic = isPublicPath(pathname);
 
   try {
     const { supabaseResponse, user } = await updateSession(request);
 
-    if (pathname === "/login") {
-      if (user) {
+    if (isPublic) {
+      if (pathname === "/login" && user) {
         return NextResponse.redirect(new URL("/dashboard", request.url));
       }
       return supabaseResponse;
@@ -21,7 +22,7 @@ export async function proxy(request: NextRequest) {
     return supabaseResponse;
   } catch (error) {
     console.error("Proxy auth error:", error);
-    if (pathname === "/login") {
+    if (isPublic) {
       return NextResponse.next();
     }
     return NextResponse.redirect(new URL("/login", request.url));

@@ -1,14 +1,18 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { User } from "@supabase/supabase-js";
+import { getSupabaseEnv } from "@/lib/supabase/env";
+
+export function isPublicPath(pathname: string) {
+  return pathname === "/login" || pathname.startsWith("/auth/");
+}
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   });
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const { url: supabaseUrl, anonKey: supabaseAnonKey } = getSupabaseEnv();
 
   if (!supabaseUrl || !supabaseAnonKey) {
     return { supabaseResponse, user: null as User | null };

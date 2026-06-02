@@ -1,10 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Eye, EyeOff, Fingerprint } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+
+const supabaseProjectRef =
+  process.env.NEXT_PUBLIC_SUPABASE_URL?.match(/https:\/\/([^.]+)\.supabase\.co/)?.[1] ?? "";
+const supabaseUsersUrl = supabaseProjectRef
+  ? `https://supabase.com/dashboard/project/${supabaseProjectRef}/auth/users`
+  : "https://supabase.com/dashboard";
 
 function formatAuthError(message: string): string {
   const lower = message.toLowerCase();
@@ -17,13 +23,20 @@ function formatAuthError(message: string): string {
   return message;
 }
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (searchParams.get("error") === "auth_callback") {
+      setError("Sign-in link expired or failed. Sign in with your email and password.");
+    }
+  }, [searchParams]);
 
   const handleLogin = async () => {
     setError("");
@@ -80,7 +93,21 @@ export default function LoginPage() {
         <h1 className="text-xs font-bold uppercase tracking-widest text-gray-900 mb-1 text-center">
           Faisal Abdullah Muhammed Ramadan Est.
         </h1>
-        <p className="text-sm text-gray-400 mb-8">Sign in to your account</p>
+        <p className="text-sm text-gray-400 mb-2">Sign in with your Supabase Auth user</p>
+        <p className="text-xs text-gray-400 mb-4 text-center leading-relaxed">
+          Use the <strong>email</strong> and <strong>password</strong> from your Supabase Auth user
+          {supabaseProjectRef ? ` (project ${supabaseProjectRef})` : ""}.
+        </p>
+        <p className="text-xs text-center mb-8">
+          <a
+            href={supabaseUsersUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:underline"
+          >
+            Open Supabase → Authentication → Users
+          </a>
+        </p>
 
         {/* Error */}
         {error && (
@@ -197,5 +224,19 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-white text-sm text-gray-500">
+          Loading...
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }
