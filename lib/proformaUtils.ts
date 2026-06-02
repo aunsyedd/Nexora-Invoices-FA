@@ -52,7 +52,7 @@ export function formatCustomerInvoiceNumber(
   refDate: Date = new Date()
 ): string {
   const yy = String(refDate.getFullYear()).slice(-2);
-  return `CI-${sequence}-FA-${yy}`;
+  return `CI-${sequence}-FRE-${yy}`;
 }
 
 export function capitalizeUnit(unit: string): string {

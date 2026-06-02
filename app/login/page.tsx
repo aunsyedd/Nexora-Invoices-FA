@@ -93,21 +93,9 @@ function LoginForm() {
         <h1 className="text-xs font-bold uppercase tracking-widest text-gray-900 mb-1 text-center">
           Faisal Abdullah Muhammed Ramadan Est.
         </h1>
-        <p className="text-sm text-gray-400 mb-2">Sign in with your Supabase Auth user</p>
-        <p className="text-xs text-gray-400 mb-4 text-center leading-relaxed">
-          Use the <strong>email</strong> and <strong>password</strong> from your Supabase Auth user
-          {supabaseProjectRef ? ` (project ${supabaseProjectRef})` : ""}.
-        </p>
-        <p className="text-xs text-center mb-8">
-          <a
-            href={supabaseUsersUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 hover:underline"
-          >
-            Open Supabase → Authentication → Users
-          </a>
-        </p>
+        <p className="text-sm text-gray-400 mb-2">Sign in with your account</p>
+
+
 
         {/* Error */}
         {error && (
