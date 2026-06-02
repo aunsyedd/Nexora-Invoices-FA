@@ -171,7 +171,7 @@ export default function CustomerForm({
 
       if (mode === "edit" && customerId) {
         const { error } = await supabase
-          .from("customers")
+          .from("customers2")
           .update(payload)
           .eq("id", customerId);
 
@@ -183,7 +183,7 @@ export default function CustomerForm({
         return;
       }
       const { error } = await supabase
-        .from("customers")
+        .from("customers2")
         .insert([payload]);
 
       if (error) throw error;

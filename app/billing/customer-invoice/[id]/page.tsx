@@ -23,7 +23,7 @@ export default function InvoicePage() {
 
     const fetchInvoice = async () => {
       const { data: invoice, error } = await supabase
-        .from("invoices")
+        .from("invoices2")
         .select("*")
         .eq("id", id)
         .single();
@@ -35,7 +35,7 @@ export default function InvoicePage() {
       }
 
       const { data: lines } = await supabase
-        .from("invoice_line_items")
+        .from("invoice_line_items2")
         .select("*")
         .eq("invoice_id", id);
 

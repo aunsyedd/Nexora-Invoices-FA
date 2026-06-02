@@ -32,7 +32,7 @@ export default function CustomerPage() {
 
   const fetchCustomers = async () => {
     const { data, error } = await supabase
-      .from("customers")
+      .from("customers2")
       .select("id, name, mobile, email, active")
       .order("id", { ascending: false });
 
@@ -46,7 +46,7 @@ export default function CustomerPage() {
     const newActive = !customer.active;
 
     const { error } = await supabase
-      .from("customers")
+      .from("customers2")
       .update({ active: newActive })
       .eq("id", customer.id);
 
@@ -72,7 +72,7 @@ export default function CustomerPage() {
     setStatusMsg("");
 
     const { count, error: countError } = await supabase
-      .from("invoices")
+      .from("invoices2")
       .select("*", { count: "exact", head: true })
       .eq("customer_id", customer.id);
 
@@ -93,7 +93,7 @@ export default function CustomerPage() {
     }
 
     const { error } = await supabase
-      .from("customers")
+      .from("customers2")
       .delete()
       .eq("id", customer.id);
 

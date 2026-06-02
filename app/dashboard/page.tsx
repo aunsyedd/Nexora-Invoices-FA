@@ -24,8 +24,8 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchCounts = async () => {
       const [{ count: customerCount }, { count: invoiceCount }] = await Promise.all([
-        supabase.from("customers").select("*", { count: "exact", head: true }),
-        supabase.from("invoices").select("*", { count: "exact", head: true }),
+        supabase.from("customers2").select("*", { count: "exact", head: true }),
+        supabase.from("invoices2").select("*", { count: "exact", head: true }),
       ]);
 
       setCards([

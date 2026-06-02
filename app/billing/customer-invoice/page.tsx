@@ -19,7 +19,7 @@ export default function CustomerInvoiceList() {
 
     const fetchInvoices = async () => {
       const { data, error } = await supabase
-        .from("invoices")
+        .from("invoices2")
         .select("*")
         .order("created_at", { ascending: false });
 

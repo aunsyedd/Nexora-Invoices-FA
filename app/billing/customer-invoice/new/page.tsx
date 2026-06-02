@@ -20,6 +20,7 @@ import {
   formatCustomerInvoiceNumber,
   formatProformaNumber,
 } from "@/lib/proformaUtils";
+import { syncInvoiceParentRow } from "@/lib/invoiceParentSync";
 
 const RETENTION_OPTIONS = [
   { value: "", label: "None" },
@@ -176,7 +177,7 @@ export default function NewInvoicePage({
 
     const fetchCustomers = async () => {
       const { data, error } = await supabase
-        .from("customers")
+        .from("customers2")
         .select("id, name, alias_name, mobile, email, active, building_no, street, district, second_no, postal_code, city, vat_no, other_id");
       if (!error && mounted) setCustomers(data || []);
     };
@@ -186,7 +187,7 @@ export default function NewInvoicePage({
     const fetchNextId = async () => {
       if (mode === "edit") return;
       const { data } = await supabase
-        .from("invoices")
+        .from("invoices2")
         .select("id")
         .order("id", { ascending: false })
         .limit(1);
@@ -380,10 +381,17 @@ export default function NewInvoicePage({
     }));
 
     if (mode === "edit" && invoiceId) {
+      const numericInvoiceId = Number(invoiceId);
+      if (!Number.isFinite(numericInvoiceId)) {
+        setSaveMsg("Invalid invoice ID.");
+        setSaving(false);
+        return;
+      }
+
       const { error: invoiceError } = await supabase
-        .from("invoices")
+        .from("invoices2")
         .update(invoicePayload)
-        .eq("id", invoiceId);
+        .eq("id", numericInvoiceId);
 
       if (invoiceError) {
         setSaveMsg("Error updating invoice: " + invoiceError.message);
@@ -391,11 +399,24 @@ export default function NewInvoicePage({
         return;
       }
 
-      await supabase.from("invoice_line_items").delete().eq("invoice_id", invoiceId);
+      const { error: parentSyncError } = await syncInvoiceParentRow(
+        numericInvoiceId,
+        invoicePayload
+      );
+      if (parentSyncError) {
+        setSaveMsg("Error syncing invoice for line items: " + parentSyncError.message);
+        setSaving(false);
+        return;
+      }
+
+      await supabase
+        .from("invoice_line_items2")
+        .delete()
+        .eq("invoice_id", numericInvoiceId);
 
       const { error: lineError } = await supabase
-        .from("invoice_line_items")
-        .insert(lineRows.map((row) => ({ ...row, invoice_id: parseInt(invoiceId) })));
+        .from("invoice_line_items2")
+        .insert(lineRows.map((row) => ({ ...row, invoice_id: numericInvoiceId })));
 
       if (lineError) {
         setSaveMsg("Invoice updated but line items failed: " + lineError.message);
@@ -409,7 +430,7 @@ export default function NewInvoicePage({
     }
 
     const { data: invoiceData, error: invoiceError } = await supabase
-      .from("invoices")
+      .from("invoices2")
       .insert([invoicePayload])
       .select()
       .single();
@@ -420,8 +441,18 @@ export default function NewInvoicePage({
       return;
     }
 
+    const { error: parentSyncError } = await syncInvoiceParentRow(
+      invoiceData.id,
+      invoicePayload
+    );
+    if (parentSyncError) {
+      setSaveMsg("Invoice saved but could not save line items: " + parentSyncError.message);
+      setSaving(false);
+      return;
+    }
+
     const { error: lineError } = await supabase
-      .from("invoice_line_items")
+      .from("invoice_line_items2")
       .insert(lineRows.map((row) => ({ ...row, invoice_id: invoiceData.id })));
 
     if (lineError) {

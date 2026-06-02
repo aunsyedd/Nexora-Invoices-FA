@@ -465,7 +465,8 @@ export const ProformaInvoicePrint = React.forwardRef<
       <div className="header-row">
         <div className="logo-wrap">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.jpg" alt="WTMC Logo" />
+          <img src="/logofaisal.jpg" alt="Faisal Abdullah Muhammed Ramadan Est.
+ Logo" />
         </div>
 
         <table className="meta-table">
@@ -708,12 +709,12 @@ export const ProformaInvoicePrint = React.forwardRef<
   <div className="bank-right">
     Payment by bank transfer to the following account:
   </div>
-  <div className="bank-right">Bank Name: Saudi National Bank</div>
-  <div className="bank-right">Account Number: 80700005253108</div>
+  <div className="bank-right">Bank Name: National Commercial Bank</div>
+  <div className="bank-right">Account Number: 13300000773810</div>
   <div className="bank-right">
-    Account Name: شركة واشيكا تبسم مروه / Washika Tabassum Marwah Co.
+    Account Name: مؤسسة فيصل عبداللـه محمد رمضان / Faisal Abdullah Muhammed Ramadan Est.
   </div>
-  <div className="bank-right">IBAN: SA8810000080700005253108</div>
+  <div className="bank-right">IBAN: SA83 1000 0013 3000 0077 3810</div>
 </div>
 
 

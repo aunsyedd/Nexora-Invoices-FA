@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Nexora Invoices | WTMC",
-  description: "Customer billing and invoice management for WTMC",
+  title: "Nexora Invoices | Faisal Abdullah Muhammed Ramadan Est.",
+  description: "Customer billing and invoice management for Faisal Abdullah Muhammed Ramadan Est.",
 };
 
 export default function RootLayout({

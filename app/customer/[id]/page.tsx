@@ -20,7 +20,7 @@ export default function EditCustomerPage() {
 
     const fetchCustomer = async () => {
       const { data, error } = await supabase
-        .from("customers")
+        .from("customers2")
         .select("*")
         .eq("id", id)
         .single();

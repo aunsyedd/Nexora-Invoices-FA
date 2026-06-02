@@ -16,7 +16,7 @@ export default function BillingPage() {
 
     const fetchCount = async () => {
       const { count, error } = await supabase
-        .from("invoices")
+        .from("invoices2")
         .select("*", { count: "exact", head: true });
 
       if (!error) setInvoiceCount(count || 0);

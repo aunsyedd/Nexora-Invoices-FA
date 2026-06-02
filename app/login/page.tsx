@@ -42,7 +42,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="mb-6 flex justify-center">
           <Image
-            src="/logo.jpg"
+            src="/logofaisal.jpg"
             alt="Nexora Invoices Logo"
             width={100}
             height={100}
@@ -53,7 +53,7 @@ export default function LoginPage() {
 
         {/* Heading */}
         <h1 className="text-xs font-bold uppercase tracking-widest text-gray-900 mb-1 text-center">
-          WASHIKA TABASSUM MARWAH Co.
+          Faisal Abdullah Muhammed Ramadan Est.
         </h1>
         <p className="text-sm text-gray-400 mb-8">Sign in to your account</p>
 

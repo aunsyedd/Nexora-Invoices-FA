@@ -55,15 +55,16 @@ export default function Navbar() {
           className="p-4 flex items-center gap-3 border-b hover:bg-gray-50 transition-colors text-left"
         >
           <Image
-            src="/logo.jpg"
-            alt="WTMC Logo"
+            src="/logofaisal.jpg"
+            alt="Faisal Abdullah Muhammed Ramadan Est. Logo"
             width={36}
             height={36}
             className="rounded object-cover"
           />
           <div className="flex flex-col leading-tight">
            <span className="text-xs font-medium text-gray-500">Nexora Invoicing Software</span>
-            <span className="text-lg font-semibold text-gray-800">WTMC</span>
+            <span className="text-sm font-semibold text-gray-800">Faisal Abdullah Muhammed Ramadan Est.
+</span>
           </div>
         </button>
 
