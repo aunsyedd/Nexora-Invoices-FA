@@ -20,7 +20,6 @@ import {
   formatCustomerInvoiceNumber,
   formatProformaNumber,
 } from "@/lib/proformaUtils";
-import { syncInvoiceParentRow } from "@/lib/invoiceParentSync";
 
 const RETENTION_OPTIONS = [
   { value: "", label: "None" },
@@ -399,16 +398,6 @@ export default function NewInvoicePage({
         return;
       }
 
-      const { error: parentSyncError } = await syncInvoiceParentRow(
-        numericInvoiceId,
-        invoicePayload
-      );
-      if (parentSyncError) {
-        setSaveMsg("Error syncing invoice for line items: " + parentSyncError.message);
-        setSaving(false);
-        return;
-      }
-
       await supabase
         .from("invoice_line_items2")
         .delete()
@@ -437,16 +426,6 @@ export default function NewInvoicePage({
 
     if (invoiceError) {
       setSaveMsg("Error saving invoice: " + invoiceError.message);
-      setSaving(false);
-      return;
-    }
-
-    const { error: parentSyncError } = await syncInvoiceParentRow(
-      invoiceData.id,
-      invoicePayload
-    );
-    if (parentSyncError) {
-      setSaveMsg("Invoice saved but could not save line items: " + parentSyncError.message);
       setSaving(false);
       return;
     }

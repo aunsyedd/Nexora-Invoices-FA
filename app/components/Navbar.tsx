@@ -10,9 +10,10 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const handleLogout = async () => {
-  await supabase.auth.signOut();
-  router.push("/login");
-};
+    await supabase.auth.signOut();
+    router.refresh();
+    router.push("/login");
+  };
 
   const isCustomerRoute = pathname?.startsWith("/customer");
   const isBillingRoute = pathname?.startsWith("/billing");

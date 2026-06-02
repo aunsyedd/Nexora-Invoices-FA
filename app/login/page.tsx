@@ -6,9 +6,20 @@ import Image from "next/image";
 import { Eye, EyeOff, Fingerprint } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 
+function formatAuthError(message: string): string {
+  const lower = message.toLowerCase();
+  if (lower.includes("invalid login credentials")) {
+    return "Invalid email or password. Sign in with the email address from your Supabase Auth user.";
+  }
+  if (lower.includes("email not confirmed")) {
+    return "Email not confirmed. Confirm your email in Supabase, or ask an admin to confirm your account.";
+  }
+  return message;
+}
+
 export default function LoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -16,21 +27,35 @@ export default function LoginPage() {
 
   const handleLogin = async () => {
     setError("");
-    if (!username || !password) {
-      setError("Please enter username and password.");
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !password) {
+      setError("Please enter email and password.");
       return;
     }
+    if (!trimmedEmail.includes("@")) {
+      setError("Please enter a valid email address (Supabase Auth uses email, not username).");
+      return;
+    }
+
     setLoading(true);
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email: username,
+    const { data, error: authError } = await supabase.auth.signInWithPassword({
+      email: trimmedEmail,
       password,
     });
     setLoading(false);
+
     if (authError) {
-      setError("Invalid username or password.");
-    } else {
-      router.push("/dashboard");
+      setError(formatAuthError(authError.message));
+      return;
     }
+
+    if (!data.session) {
+      setError("Sign-in succeeded but no session was created. Try again.");
+      return;
+    }
+
+    router.refresh();
+    router.push("/dashboard");
   };
 
   return (
@@ -64,13 +89,14 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* Username */}
+        {/* Email */}
         <div className="w-full mb-4">
           <input
-            type="text"
-            placeholder="Username *"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            type="email"
+            autoComplete="email"
+            placeholder="Email *"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleLogin()}
             className="w-full border border-gray-200 rounded px-4 py-3 text-sm text-gray-800 outline-none focus:border-gray-400 transition-colors placeholder-gray-400 bg-white"
           />
@@ -80,6 +106,7 @@ export default function LoginPage() {
         <div className="w-full mb-6 relative">
           <input
             type={showPassword ? "text" : "password"}
+            autoComplete="current-password"
             placeholder="Password *"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
