@@ -125,7 +125,7 @@ export default function CustomerPage() {
   // Auth guard
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
           <p className="text-sm text-gray-500 font-medium">Loading...</p>
@@ -137,17 +137,20 @@ export default function CustomerPage() {
   if (!user) return null;
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
       <Navbar />
 
-      <main className="flex-1 pt-14 overflow-y-auto">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-semibold text-gray-800">Customers</h1>
+      <main className="flex-1 pt-14 overflow-y-auto w-full">
+        <div className="px-4 py-4 sm:p-6 max-w-7xl mx-auto w-full">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+              <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">
+                Customers
+              </h1>
               <Link
                 href="/customer/new"
-                className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-sm text-sm font-medium transition-colors shadow-sm"
+                className="inline-flex items-center justify-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-sm text-sm font-medium transition-colors shadow-sm w-full sm:w-auto"
               >
                 <Plus size={16} />
                 New Customer
@@ -173,28 +176,35 @@ export default function CustomerPage() {
 
           <div className="bg-white rounded shadow-sm border border-gray-200">
             <div className="p-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-800">All Customers</h2>
+              <h2 className="text-base sm:text-lg font-semibold text-gray-800">
+                All Customers
+              </h2>
               <p className="text-xs text-gray-500 mt-1">
-                Click a customer name to edit. Click status to toggle Active / Inactive.
+                Tap a customer name to edit. Tap status to toggle Active / Inactive.
               </p>
             </div>
 
             <div className="p-4">
-              <div className="flex justify-end mb-4 items-center gap-2">
+              {/* Search */}
+              <div className="flex flex-col sm:flex-row sm:justify-end mb-4 sm:items-center gap-2">
                 <span className="text-sm">Search:</span>
-                <div className="relative">
-                  <Search size={14} className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" />
+                <div className="relative w-full sm:w-64">
+                  <Search
+                    size={14}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400"
+                  />
                   <input
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Name, mobile, email..."
-                    className="border rounded pl-7 pr-2 py-1 text-sm outline-none focus:border-blue-500 w-64"
+                    className="border rounded pl-7 pr-2 py-1.5 text-sm outline-none focus:border-blue-500 w-full"
                   />
                 </div>
               </div>
 
-              <div className="overflow-x-auto">
+              {/* ===== DESKTOP / TABLET TABLE (md and up) ===== */}
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full border-collapse border border-gray-200 text-sm">
                   <thead>
                     <tr className="bg-gray-50 text-gray-700 uppercase text-xs font-bold border-b">
@@ -228,8 +238,12 @@ export default function CustomerPage() {
                               {c.name}
                             </Link>
                           </td>
-                          <td className="p-3 border-r text-gray-700">{c.mobile || "—"}</td>
-                          <td className="p-3 border-r text-gray-700">{c.email || "—"}</td>
+                          <td className="p-3 border-r text-gray-700">
+                            {c.mobile || "—"}
+                          </td>
+                          <td className="p-3 border-r text-gray-700 break-all">
+                            {c.email || "—"}
+                          </td>
                           <td className="p-3 border-r">
                             <button
                               type="button"
@@ -242,7 +256,11 @@ export default function CustomerPage() {
                                   : "bg-gray-400 text-white hover:bg-gray-500"
                               }`}
                             >
-                              {togglingId === c.id ? "..." : c.active ? "Active" : "Inactive"}
+                              {togglingId === c.id
+                                ? "..."
+                                : c.active
+                                ? "Active"
+                                : "Inactive"}
                             </button>
                           </td>
                           <td className="p-3">
@@ -273,8 +291,100 @@ export default function CustomerPage() {
                 </table>
               </div>
 
-              <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
-                <span>Showing {filtered.length} of {customers.length} entries</span>
+              {/* ===== MOBILE CARD LIST (below md) ===== */}
+              <div className="md:hidden space-y-3">
+                {filtered.length === 0 ? (
+                  <div className="p-6 text-center text-gray-500 border border-gray-200 rounded">
+                    {search
+                      ? "No customers match your search."
+                      : "No customers yet. Add your first customer."}
+                  </div>
+                ) : (
+                  filtered.map((c) => (
+                    <div
+                      key={c.id}
+                      className="border border-gray-200 rounded-lg p-4 shadow-sm bg-white"
+                    >
+                      <div className="flex justify-between items-start gap-3">
+                        <div className="min-w-0">
+                          <Link
+                            href={`/customer/${c.id}`}
+                            className="text-blue-600 hover:underline font-semibold text-base break-words"
+                          >
+                            {c.name}
+                          </Link>
+                          <p className="text-xs text-gray-400 mt-0.5">
+                            ID: {c.id}
+                          </p>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleToggleActive(c)}
+                          disabled={togglingId === c.id}
+                          title="Tap to toggle Active / Inactive"
+                          className={`px-3 py-1 rounded text-xs font-semibold min-w-[78px] shrink-0 transition-colors disabled:opacity-50 ${
+                            c.active
+                              ? "bg-green-600 text-white hover:bg-green-700"
+                              : "bg-gray-400 text-white hover:bg-gray-500"
+                          }`}
+                        >
+                          {togglingId === c.id
+                            ? "..."
+                            : c.active
+                            ? "Active"
+                            : "Inactive"}
+                        </button>
+                      </div>
+
+                      <div className="mt-3 space-y-1.5 text-sm">
+                        <div className="flex gap-2">
+                          <span className="text-gray-500 w-16 shrink-0">
+                            Mobile:
+                          </span>
+                          <span className="text-gray-700 break-all">
+                            {c.mobile || "—"}
+                          </span>
+                        </div>
+                        <div className="flex gap-2">
+                          <span className="text-gray-500 w-16 shrink-0">
+                            Email:
+                          </span>
+                          <span className="text-gray-700 break-all">
+                            {c.email || "—"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-4">
+                        <Link
+                          href={`/customer/${c.id}`}
+                          className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm font-medium"
+                        >
+                          <Pencil size={14} />
+                          Edit
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(c)}
+                          disabled={deletingId === c.id}
+                          title="Delete customer"
+                          className="inline-flex items-center gap-1 text-red-600 hover:text-red-800 text-sm font-medium disabled:opacity-50"
+                        >
+                          <Trash2 size={14} />
+                          {deletingId === c.id ? "Deleting..." : "Delete"}
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Footer summary */}
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-4 gap-1 text-xs sm:text-sm text-gray-500">
+                <span>
+                  Showing {filtered.length} of {customers.length} entries
+                </span>
                 <span>
                   {customers.filter((c) => c.active).length} active ·{" "}
                   {customers.filter((c) => !c.active).length} inactive

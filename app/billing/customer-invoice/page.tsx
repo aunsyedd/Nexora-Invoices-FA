@@ -49,7 +49,7 @@ export default function CustomerInvoiceList() {
 
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
           <p className="text-sm text-gray-500 font-medium">Loading...</p>
@@ -61,17 +61,20 @@ export default function CustomerInvoiceList() {
   if (!user) return null;
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
       <Navbar />
 
-      <main className="flex-1 pt-14 overflow-y-auto">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-semibold text-gray-800">Customer Invoices</h1>
+      <main className="flex-1 pt-14 overflow-y-auto w-full">
+        <div className="px-4 py-4 sm:p-6 max-w-7xl mx-auto w-full">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4 sm:mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+              <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">
+                Customer Invoices
+              </h1>
               <Link
                 href="/billing/customer-invoice/new"
-                className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors shadow-sm"
+                className="inline-flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors shadow-sm w-full sm:w-auto"
               >
                 <Plus size={16} />
                 New Invoice
@@ -83,20 +86,25 @@ export default function CustomerInvoiceList() {
           </div>
 
           <div className="bg-white rounded border border-gray-200 shadow-sm">
-            <div className="p-4 border-b border-gray-200 flex justify-end">
-              <div className="relative">
-                <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
+            {/* Search */}
+            <div className="p-4 border-b border-gray-200 flex justify-stretch sm:justify-end">
+              <div className="relative w-full sm:w-72">
+                <Search
+                  size={14}
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400"
+                />
                 <input
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search invoice #, customer, PO..."
-                  className="border border-gray-300 pl-8 pr-3 py-1.5 text-sm w-72 rounded outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="border border-gray-300 pl-8 pr-3 py-1.5 text-sm w-full rounded outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 />
               </div>
             </div>
 
-            <div className="overflow-x-auto">
+            {/* ===== DESKTOP / TABLET TABLE (md and up) ===== */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left text-sm border-collapse">
                 <thead>
                   <tr className="bg-gray-50 border-b border-gray-200 text-gray-700 uppercase text-xs tracking-wide">
@@ -155,7 +163,102 @@ export default function CustomerInvoiceList() {
               </table>
             </div>
 
-            <div className="px-4 py-3 border-t border-gray-200 text-sm text-gray-500">
+            {/* ===== MOBILE CARD LIST (below md) ===== */}
+            <div className="md:hidden p-4 space-y-3">
+              {loading ? (
+                <div className="p-6 text-center text-gray-500">Loading invoices...</div>
+              ) : filteredInvoices.length === 0 ? (
+                <div className="p-6 text-center text-gray-500 border border-gray-200 rounded">
+                  {search ? "No invoices match your search." : "No invoices found. Create your first invoice."}
+                </div>
+              ) : (
+                <>
+                  {filteredInvoices.map((row) => (
+                    <div
+                      key={row.id}
+                      className="border border-gray-200 rounded-lg p-4 shadow-sm bg-white"
+                    >
+                      {/* Top: Invoice # + Date */}
+                      <div className="flex justify-between items-start gap-3">
+                        <div className="min-w-0">
+                          <Link
+                            href={`/billing/customer-invoice/${row.id}`}
+                            className="text-blue-600 hover:underline font-semibold text-base break-words"
+                          >
+                            #{row.number}
+                          </Link>
+                          <p className="text-xs text-gray-400 mt-0.5">
+                            {formatProformaDate(row.date) || row.date}
+                          </p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="text-xs text-gray-500">Net Total</p>
+                          <p className="font-bold text-gray-900">
+                            {formatProformaNumber(row.net_amount)}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Customer */}
+                      <div className="mt-2">
+                        <p className="text-sm font-medium text-gray-800 break-words">
+                          {row.customer_name}
+                        </p>
+                      </div>
+
+                      {/* Details */}
+                      <div className="mt-3 space-y-1.5 text-sm">
+                        <div className="flex gap-2">
+                          <span className="text-gray-500 w-24 shrink-0">Description:</span>
+                          <span className="text-gray-700 break-words">{row.description || "—"}</span>
+                        </div>
+                        <div className="flex gap-2">
+                          <span className="text-gray-500 w-24 shrink-0">P.O. Number:</span>
+                          <span className="text-gray-700 break-words">{row.po_number || "—"}</span>
+                        </div>
+                        <div className="flex gap-2">
+                          <span className="text-gray-500 w-24 shrink-0">Project:</span>
+                          <span className="text-gray-700 break-words">{row.project_name || "—"}</span>
+                        </div>
+                      </div>
+
+                      {/* Amounts */}
+                      <div className="mt-3 pt-3 border-t border-gray-100 grid grid-cols-2 gap-2 text-sm">
+                        <div>
+                          <p className="text-xs text-gray-500">Amount</p>
+                          <p className="text-gray-700">{formatProformaNumber(row.total_amount)}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500">VAT</p>
+                          <p className="text-gray-700">{formatProformaNumber(row.vat_amount)}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Mobile Totals Card */}
+                  <div className="border-2 border-gray-300 rounded-lg p-4 bg-gray-50">
+                    <p className="font-semibold text-gray-800 mb-2">Totals</p>
+                    <div className="grid grid-cols-3 gap-2 text-sm">
+                      <div>
+                        <p className="text-xs text-gray-500">Amount</p>
+                        <p className="font-semibold text-gray-800">{formatProformaNumber(totalAmount)}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">VAT</p>
+                        <p className="font-semibold text-gray-800">{formatProformaNumber(totalVat)}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Net Total</p>
+                        <p className="font-semibold text-gray-900">{formatProformaNumber(totalNet)}</p>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="px-4 py-3 border-t border-gray-200 text-xs sm:text-sm text-gray-500">
               Showing {filteredInvoices.length} of {invoices.length} entries
             </div>
           </div>

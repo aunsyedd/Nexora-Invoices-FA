@@ -118,8 +118,6 @@ export default function NewInvoicePage({
   const [editItem, setEditItem] = useState<LineItem | null>(null);
 
   // ── VALIDATION STATE ─────────────────────────────────────
-  // Controls whether the ZATCA QR code is shown in the Amount
-  // section and included in the printed invoice.
   const [isValidated, setIsValidated] = useState(false);
   // ────────────────────────────────────────────────────────
 
@@ -447,7 +445,7 @@ export default function NewInvoicePage({
   // ── AUTH GUARD ──────────────────────────────────────────
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
           <p className="text-sm text-gray-500 font-medium">Loading...</p>
@@ -460,19 +458,19 @@ export default function NewInvoicePage({
   // ────────────────────────────────────────────────────────
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
       <Navbar />
 
-      <main className="flex-1 pt-14 overflow-y-auto">
-        <div className="p-6 space-y-4">
+      <main className="flex-1 pt-14 overflow-y-auto w-full">
+        <div className="px-4 py-4 sm:p-6 space-y-4 max-w-7xl mx-auto w-full">
 
           {/* HEADER */}
-          <div className="flex justify-between items-center mb-2">
-            <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-semibold text-gray-800">Customer Invoice</h1>
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-2">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+              <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">Customer Invoice</h1>
               <Link
                 href="/billing/customer-invoice"
-                className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors shadow-sm"
+                className="inline-flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors shadow-sm w-full sm:w-auto"
               >
                 <List size={16} />
                 Invoice List
@@ -490,7 +488,7 @@ export default function NewInvoicePage({
           {/* 1. General Section */}
           <div className="bg-white border border-gray-200 rounded shadow-sm overflow-hidden">
             <SectionHeader title="General" />
-            <div className="p-4 grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               <div>
                 <label className="block text-xs font-bold mb-1">ID</label>
                 <input type="text" value={invoiceId || "Loading..."} disabled className="w-full border border-gray-300 p-1.5 bg-gray-100 text-black text-sm" />
@@ -532,7 +530,7 @@ export default function NewInvoicePage({
             {/* 2. Detail Section */}
             <div className="lg:col-span-3 bg-white border border-gray-200 rounded shadow-sm overflow-hidden">
               <SectionHeader title="Detail" />
-              <div className="p-4 grid grid-cols-2 gap-4">
+              <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold mb-1">Customer Name</label>
                   <select value={customerId} onChange={handleCustomerChange} className="w-full border border-gray-300 p-1.5 text-gray-800 text-sm rounded outline-none focus:border-blue-500">
@@ -559,7 +557,7 @@ export default function NewInvoicePage({
                     <option value="90_days">After 90 Days</option>
                   </select>
                 </div>
-                <div className="col-span-2">
+                <div className="sm:col-span-2">
                   <label className="block text-xs font-bold mb-1">Description</label>
                   <input type="text" placeholder="Enter description" value={description} onChange={(e) => setDescription(e.target.value)} className="w-full border border-gray-300 p-1.5 text-gray-800 text-sm rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none" />
                 </div>
@@ -573,7 +571,7 @@ export default function NewInvoicePage({
                     <option value="not_defined">Not Defined</option>
                   </select>
                 </div>
-                <div className="col-span-1 hidden lg:block" aria-hidden />
+                <div className="hidden sm:block" aria-hidden />
                 <div>
                   <label className="block text-xs font-bold mb-1">Purchase Order No.</label>
                   <input type="text" placeholder="Enter PO number" value={poNumber} onChange={(e) => setPoNumber(e.target.value)} className="w-full border border-gray-300 p-1.5 text-gray-800 text-sm rounded focus:border-blue-500 outline-none" />
@@ -602,7 +600,7 @@ export default function NewInvoicePage({
                     </p>
                   )}
                 </div>
-                <div className="col-span-2">
+                <div className="sm:col-span-2">
                   <label className="block text-xs font-bold mb-1">Public Note</label>
                   <input type="text" placeholder="Note shown on invoice" value={publicNote} onChange={(e) => setPublicNote(e.target.value)} className="w-full border border-gray-300 p-1.5 text-gray-800 text-sm rounded focus:border-blue-500 outline-none" />
                 </div>
@@ -663,14 +661,15 @@ export default function NewInvoicePage({
           <div className="bg-white border border-gray-200 rounded shadow-sm overflow-hidden">
             <SectionHeader title="Line Items" />
             <div className="p-4">
-              <div className="flex justify-end mb-2">
+              <div className="flex flex-col sm:flex-row sm:justify-end mb-2 gap-2">
                 <div className="flex items-center gap-2 text-xs text-black font-bold">
                   Search:
-                  <input type="text" value={lineSearch} onChange={(e) => setLineSearch(e.target.value)} className="border border-gray-300 p-1 outline-none font-normal" />
+                  <input type="text" value={lineSearch} onChange={(e) => setLineSearch(e.target.value)} className="border border-gray-300 p-1 outline-none font-normal flex-1 sm:flex-none" />
                 </div>
               </div>
 
-              <div className="overflow-x-auto">
+              {/* ===== DESKTOP / TABLET TABLE (md and up) ===== */}
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full border-collapse border border-gray-300 text-xs">
                   <thead>
                     <tr className="bg-gray-100 text-black uppercase font-bold">
@@ -744,9 +743,86 @@ export default function NewInvoicePage({
                 </table>
               </div>
 
+              {/* ===== MOBILE CARD LIST (below md) ===== */}
+              <div className="md:hidden space-y-3">
+                {filteredItems.length === 0 ? (
+                  <div className="p-4 text-center text-black font-medium border border-gray-300 rounded">
+                    No data available in table
+                  </div>
+                ) : (
+                  filteredItems.map(({ item, originalIndex }, displayIndex) =>
+                    editingIndex === originalIndex && editItem ? (
+                      <div key={originalIndex} className="border border-yellow-300 bg-yellow-50 rounded-lg p-3 space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs font-bold text-gray-500">#{displayIndex + 1} (Editing)</span>
+                          <div className="flex gap-3">
+                            <button onClick={handleSaveEdit} className="text-green-600 hover:text-green-800" title="Save"><Check size={18} /></button>
+                            <button onClick={handleCancelEdit} className="text-gray-500 hover:text-gray-700" title="Cancel"><X size={18} /></button>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-bold uppercase text-gray-500">Description</label>
+                          <input type="text" value={editItem.description} onChange={(e) => handleEditChange("description", e.target.value)} className="w-full border border-gray-300 p-1.5 text-sm outline-none" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="text-[10px] font-bold uppercase text-gray-500">Unit</label>
+                            <select value={editItem.unit} onChange={(e) => handleEditChange("unit", e.target.value)} className="w-full border border-gray-300 p-1.5 text-sm outline-none">
+                              <option value="pcs">Pcs</option>
+                              <option value="box">Box</option>
+                              <option value="mtr">Mtr</option>
+                              <option value="floors">Floors</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="text-[10px] font-bold uppercase text-gray-500">VAT</label>
+                            <select value={editItem.vat} onChange={(e) => handleEditChange("vat", e.target.value)} className="w-full border border-gray-300 p-1.5 text-sm outline-none">
+                              <option>VAT 15%</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="text-[10px] font-bold uppercase text-gray-500">Qty</label>
+                            <input type="text" value={editItem.qty} onChange={(e) => handleEditChange("qty", e.target.value)} className="w-full border border-gray-300 p-1.5 text-sm outline-none" />
+                          </div>
+                          <div>
+                            <label className="text-[10px] font-bold uppercase text-gray-500">Rate</label>
+                            <input type="text" value={editItem.rate} onChange={(e) => handleEditChange("rate", e.target.value)} className="w-full border border-gray-300 p-1.5 text-sm outline-none" />
+                          </div>
+                        </div>
+                        <div className="flex justify-between text-sm pt-1 border-t border-yellow-200">
+                          <span className="font-medium">Amount: {editItem.amount}</span>
+                          <span className="font-bold">Total: {editItem.total}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div key={originalIndex} className="border border-gray-200 rounded-lg p-3 shadow-sm">
+                        <div className="flex justify-between items-start gap-2">
+                          <div className="min-w-0">
+                            <span className="text-[10px] font-bold text-gray-400">#{displayIndex + 1}</span>
+                            <p className="text-sm font-medium text-gray-800 break-words">{item.description}</p>
+                          </div>
+                          <div className="flex gap-3 shrink-0">
+                            <button onClick={() => handleStartEdit(originalIndex)} className="text-blue-600 hover:text-blue-800" title="Edit"><Pencil size={16} /></button>
+                            <button onClick={() => handleRemoveLineItem(originalIndex)} className="text-red-600 hover:text-red-800" title="Delete"><Trash2 size={16} /></button>
+                          </div>
+                        </div>
+                        <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+                          <div className="flex justify-between"><span className="text-gray-500">Unit:</span><span className="text-gray-800">{item.unit}</span></div>
+                          <div className="flex justify-between"><span className="text-gray-500">Qty:</span><span className="text-gray-800">{item.qty}</span></div>
+                          <div className="flex justify-between"><span className="text-gray-500">Rate:</span><span className="text-gray-800">{item.rate}</span></div>
+                          <div className="flex justify-between"><span className="text-gray-500">VAT:</span><span className="text-gray-800">{item.vat}</span></div>
+                          <div className="flex justify-between"><span className="text-gray-500">Amount:</span><span className="text-gray-800">{item.amount}</span></div>
+                          <div className="flex justify-between"><span className="text-gray-500">Total:</span><span className="font-bold text-gray-900">{item.total}</span></div>
+                        </div>
+                      </div>
+                    )
+                  )
+                )}
+              </div>
+
               <div className="mt-4 border-t border-gray-200 pt-4 grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <div className="flex gap-4 mb-2">
+                  <div className="flex flex-wrap gap-4 mb-2">
                     <label className="flex items-center gap-1 text-xs font-bold text-gray-700">
                       <input type="radio" name="itemType" checked={itemType === "presaved"} onChange={() => setItemType("presaved")} disabled className="opacity-50" /> Pre Saved Items
                     </label>
@@ -793,7 +869,7 @@ export default function NewInvoicePage({
               </div>
 
               <div className="flex justify-end mt-4 gap-2">
-                <button onClick={handleAddLineItem} className="bg-blue-600 text-white text-sm px-5 py-1.5 rounded font-medium shadow-sm hover:bg-blue-700 transition-colors">
+                <button onClick={handleAddLineItem} className="bg-blue-600 text-white text-sm px-5 py-1.5 rounded font-medium shadow-sm hover:bg-blue-700 transition-colors w-full sm:w-auto">
                   Add Line Item
                 </button>
               </div>
@@ -812,12 +888,12 @@ export default function NewInvoicePage({
           )}
 
           {/* ── Bottom Action Buttons ── */}
-          <div className="flex flex-wrap gap-3 py-2">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 py-2">
             {/* Save / Update */}
             <button
               onClick={handleSave}
               disabled={saving}
-              className="bg-blue-600 text-white px-6 py-2 rounded text-sm font-medium shadow-sm hover:bg-blue-700 disabled:opacity-60 transition-colors"
+              className="bg-blue-600 text-white px-6 py-2 rounded text-sm font-medium shadow-sm hover:bg-blue-700 disabled:opacity-60 transition-colors w-full sm:w-auto"
             >
               {saving ? "Saving..." : mode === "edit" ? "Update Invoice" : "Save Invoice"}
             </button>
@@ -825,30 +901,23 @@ export default function NewInvoicePage({
             {/* Print Invoice */}
             <button
               onClick={() => handlePrintProforma()}
-              className="bg-white text-blue-600 border border-blue-600 px-6 py-2 rounded text-sm font-medium shadow-sm hover:bg-blue-50 transition-colors"
+              className="bg-white text-blue-600 border border-blue-600 px-6 py-2 rounded text-sm font-medium shadow-sm hover:bg-blue-50 transition-colors w-full sm:w-auto"
             >
               Print Invoice
             </button>
 
-            {/*
-             * ── VALIDATE / INVALIDATE TOGGLE ──────────────────────────
-             * Validate  → green button: sets isValidated = true
-             *             shows QR in Amount section + printed invoice
-             * Invalidate → red button: sets isValidated = false
-             *             hides QR from Amount section + printed invoice
-             * ──────────────────────────────────────────────────────────
-             */}
+            {/* ── VALIDATE / INVALIDATE TOGGLE ── */}
             {!isValidated ? (
               <button
                 onClick={() => setIsValidated(true)}
-                className="bg-green-600 text-white px-6 py-2 rounded text-sm font-medium shadow-sm hover:bg-green-700 transition-colors"
+                className="bg-green-600 text-white px-6 py-2 rounded text-sm font-medium shadow-sm hover:bg-green-700 transition-colors w-full sm:w-auto"
               >
                 Validate
               </button>
             ) : (
               <button
                 onClick={() => setIsValidated(false)}
-                className="bg-red-600 text-white px-6 py-2 rounded text-sm font-medium shadow-sm hover:bg-red-700 transition-colors"
+                className="bg-red-600 text-white px-6 py-2 rounded text-sm font-medium shadow-sm hover:bg-red-700 transition-colors w-full sm:w-auto"
               >
                 Invalidate
               </button>
@@ -857,8 +926,8 @@ export default function NewInvoicePage({
 
           {/* Validation status badge */}
           {isValidated && (
-            <div className="flex items-center gap-2 text-xs font-medium text-green-700 bg-green-50 border border-green-200 px-3 py-2 rounded w-fit">
-              <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
+            <div className="flex items-center gap-2 text-xs font-medium text-green-700 bg-green-50 border border-green-200 px-3 py-2 rounded w-full sm:w-fit">
+              <span className="w-2 h-2 rounded-full bg-green-500 inline-block shrink-0" />
               Invoice validated — QR code is active and will appear on the printed invoice.
             </div>
           )}
@@ -866,13 +935,7 @@ export default function NewInvoicePage({
         </div>
       </main>
 
-      {/*
-       * Hidden print target.
-       * `showQr={isValidated}` tells ProformaInvoicePrint whether to
-       * render the ZatcaQRCodeDisplay inside the printed document.
-       * Make sure your ProformaInvoicePrint component accepts and
-       * respects the `showQr` prop (see note below).
-       */}
+      {/* Hidden print target */}
       <div aria-hidden style={{ position: "fixed", left: "-10000px", top: 0, zIndex: -1 }}>
         <ProformaInvoicePrint 
           ref={printRef}

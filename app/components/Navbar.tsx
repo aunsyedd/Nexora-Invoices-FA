@@ -1,18 +1,43 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import { supabase } from "@/lib/supabaseClient";
-import { Home, Users, FileText, ChevronDown } from "lucide-react";
+import { Home, Users, FileText, ChevronDown, Menu, X } from "lucide-react";
 import Footer from "./Footer";
 
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Close sidebar whenever the route changes (mobile UX)
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [pathname]);
+
+  // Lock body scroll when mobile sidebar is open
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [sidebarOpen]);
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.refresh();
     router.push("/login");
+  };
+
+  const navigate = (path: string) => {
+    router.push(path);
+    setSidebarOpen(false);
   };
 
   const isCustomerRoute = pathname?.startsWith("/customer");
@@ -49,10 +74,37 @@ export default function Navbar() {
 
   return (
     <>
-      <aside className="w-64 bg-white border-r border-gray-200 shrink-0 h-screen sticky top-0 flex flex-col shadow-sm">
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={`
+          w-64 bg-white border-r border-gray-200 shrink-0 h-screen flex flex-col shadow-sm
+          fixed top-0 left-0 z-50 transform transition-transform duration-300 ease-in-out
+          md:sticky md:translate-x-0
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+        `}
+      >
+        {/* Close button (mobile only) */}
         <button
           type="button"
-          onClick={() => router.push("/dashboard")}
+          onClick={() => setSidebarOpen(false)}
+          className="md:hidden absolute top-3 right-3 p-1.5 text-gray-500 hover:bg-gray-100 rounded transition-colors"
+          aria-label="Close menu"
+        >
+          <X size={20} />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => navigate("/dashboard")}
           className="p-4 flex items-center gap-3 border-b hover:bg-gray-50 transition-colors text-left"
         >
           <Image
@@ -60,12 +112,15 @@ export default function Navbar() {
             alt="Faisal Abdullah Muhammed Ramadan Est. Logo"
             width={36}
             height={36}
-            className="rounded object-cover"
+            className="rounded object-cover shrink-0"
           />
-          <div className="flex flex-col leading-tight">
-           <span className="text-xs font-medium text-gray-500">Nexora Invoicing Software</span>
-            <span className="text-sm font-semibold text-gray-800">Faisal Abdullah Muhammed Ramadan Est.
-</span>
+          <div className="flex flex-col leading-tight pr-6">
+            <span className="text-xs font-medium text-gray-500">
+              Nexora Invoicing Software
+            </span>
+            <span className="text-sm font-semibold text-gray-800">
+              Faisal Abdullah Muhammed Ramadan Est.
+            </span>
           </div>
         </button>
 
@@ -83,8 +138,8 @@ export default function Navbar() {
               <div
                 role="button"
                 tabIndex={0}
-                onClick={() => router.push("/customer/new")}
-                onKeyDown={(e) => e.key === "Enter" && router.push("/customer/new")}
+                onClick={() => navigate("/customer/new")}
+                onKeyDown={(e) => e.key === "Enter" && navigate("/customer/new")}
                 className={navItemClass(isCustomerNewActive)}
               >
                 New Customer
@@ -92,8 +147,8 @@ export default function Navbar() {
               <div
                 role="button"
                 tabIndex={0}
-                onClick={() => router.push("/customer")}
-                onKeyDown={(e) => e.key === "Enter" && router.push("/customer")}
+                onClick={() => navigate("/customer")}
+                onKeyDown={(e) => e.key === "Enter" && navigate("/customer")}
                 className={navItemClass(isCustomerListActive)}
               >
                 Customer List
@@ -112,9 +167,9 @@ export default function Navbar() {
               <div
                 role="button"
                 tabIndex={0}
-                onClick={() => router.push("/billing/customer-invoice/new")}
+                onClick={() => navigate("/billing/customer-invoice/new")}
                 onKeyDown={(e) =>
-                  e.key === "Enter" && router.push("/billing/customer-invoice/new")
+                  e.key === "Enter" && navigate("/billing/customer-invoice/new")
                 }
                 className={navItemClass(isInvoiceNewActive)}
               >
@@ -123,9 +178,9 @@ export default function Navbar() {
               <div
                 role="button"
                 tabIndex={0}
-                onClick={() => router.push("/billing/customer-invoice")}
+                onClick={() => navigate("/billing/customer-invoice")}
                 onKeyDown={(e) =>
-                  e.key === "Enter" && router.push("/billing/customer-invoice")
+                  e.key === "Enter" && navigate("/billing/customer-invoice")
                 }
                 className={navItemClass(isInvoiceListActive)}
               >
@@ -138,9 +193,20 @@ export default function Navbar() {
         <Footer />
       </aside>
 
-      <div className="fixed top-0 left-64 right-0 z-50">
-        <header className="bg-white px-4 border-b border-gray-200 flex items-center justify-between shadow-sm h-14">
+      {/* Top header */}
+      <div className="fixed top-0 left-0 right-0 md:left-64 z-30">
+        <header className="bg-white px-3 sm:px-4 border-b border-gray-200 flex items-center justify-between shadow-sm h-14">
           <div className="flex items-center gap-2">
+            {/* Hamburger (mobile only) */}
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              className="md:hidden p-2 text-blue-600 hover:bg-gray-100 rounded transition-colors"
+              aria-label="Open menu"
+            >
+              <Menu size={20} />
+            </button>
+
             <button
               type="button"
               onClick={() => router.push("/dashboard")}
@@ -153,7 +219,7 @@ export default function Navbar() {
             <button
               type="button"
               onClick={() => router.push("/billing")}
-              className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+              className={`px-2.5 sm:px-3 py-1.5 rounded text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
                 isBillingRoute
                   ? "bg-blue-600 text-white"
                   : "text-blue-600 border border-blue-600 hover:bg-blue-50"
@@ -163,23 +229,23 @@ export default function Navbar() {
             </button>
           </div>
 
-<div className="flex items-center gap-3">
-  <span className="text-sm text-gray-600 hidden sm:inline">Admin</span>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <span className="text-sm text-gray-600 hidden sm:inline">Admin</span>
 
-  <div className="flex items-center gap-2">
-    <div className="flex items-center gap-1 bg-blue-600 text-white px-3 py-1.5 rounded text-sm font-medium">
-      Syed
-      <ChevronDown size={14} />
-    </div>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="flex items-center gap-1 bg-blue-600 text-white px-2.5 sm:px-3 py-1.5 rounded text-xs sm:text-sm font-medium">
+                Syed
+                <ChevronDown size={14} />
+              </div>
 
-    <button
-      onClick={handleLogout}
-      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded text-sm font-medium transition"
-    >
-      Logout
-    </button>
-  </div>
-</div>
+              <button
+                onClick={handleLogout}
+                className="bg-red-600 hover:bg-red-700 text-white px-2.5 sm:px-3 py-1.5 rounded text-xs sm:text-sm font-medium transition"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
         </header>
       </div>
     </>

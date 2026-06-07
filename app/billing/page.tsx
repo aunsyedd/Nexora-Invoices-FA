@@ -27,7 +27,7 @@ export default function BillingPage() {
 
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
           <p className="text-sm text-gray-500 font-medium">Loading...</p>
@@ -48,36 +48,36 @@ export default function BillingPage() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
       <Navbar />
 
-      <main className="flex-1 pt-14 overflow-y-auto">
-        <div className="p-6">
+      <main className="flex-1 pt-14 overflow-y-auto w-full">
+        <div className="px-4 py-4 sm:p-6 max-w-7xl mx-auto w-full">
 
-          <div className="flex justify-between items-center mb-4">
-            <h1 className="text-2xl font-medium text-gray-800">Billing</h1>
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
+            <h1 className="text-xl sm:text-2xl font-medium text-gray-800">Billing</h1>
             <div className="text-xs text-blue-600">
               Home / <span className="text-gray-400">Billing</span>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {stats.map((stat, idx) => (
               <div
                 key={idx}
-                className={`${stat.color} rounded shadow-md text-white overflow-hidden flex flex-col transition-transform hover:scale-[1.02]`}
+                className={`${stat.color} rounded-lg shadow-md text-white overflow-hidden flex flex-col transition-transform hover:scale-[1.02]`}
               >
                 <div className="p-4 flex justify-between items-start">
                   <div>
-                    <h2 className="text-4xl font-bold">{stat.count}</h2>
-                    <p className="text-lg mt-1 font-medium">{stat.title}</p>
+                    <h2 className="text-3xl sm:text-4xl font-bold">{stat.count}</h2>
+                    <p className="text-base sm:text-lg mt-1 font-medium">{stat.title}</p>
                   </div>
                   {stat.icon}
                 </div>
 
                 <Link
                   href="/billing/customer-invoice"
-                  className="bg-black/10 hover:bg-black/20 transition-colors py-2 text-sm flex items-center justify-center gap-1 w-full text-center"
+                  className="bg-black/10 hover:bg-black/20 transition-colors py-2 text-sm flex items-center justify-center gap-1 w-full text-center mt-auto"
                 >
                   More info →
                 </Link>

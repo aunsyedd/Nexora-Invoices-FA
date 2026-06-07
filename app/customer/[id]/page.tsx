@@ -40,10 +40,13 @@ export default function EditCustomerPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-gray-100">
+      <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
         <Navbar />
-        <main className="flex-1 pt-14 flex items-center justify-center">
-          <p className="text-gray-500 text-sm">Loading customer...</p>
+        <main className="flex-1 pt-14 flex items-center justify-center px-4 w-full">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+            <p className="text-gray-500 text-sm font-medium">Loading customer...</p>
+          </div>
         </main>
       </div>
     );
@@ -51,9 +54,9 @@ export default function EditCustomerPage() {
 
   if (notFound || !customerData) {
     return (
-      <div className="flex min-h-screen bg-gray-100">
+      <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
         <Navbar />
-        <main className="flex-1 pt-14 flex flex-col items-center justify-center gap-2">
+        <main className="flex-1 pt-14 flex flex-col items-center justify-center gap-2 px-4 w-full text-center">
           <p className="text-gray-700 font-medium">Customer not found</p>
           <Link href="/customer" className="text-blue-600 text-sm hover:underline">
             Back to customer list

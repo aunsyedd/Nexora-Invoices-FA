@@ -1,6 +1,5 @@
 "use client";
 
-
 import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
@@ -200,10 +199,10 @@ export default function CustomerForm({
       setIsSaving(false);
     }
   };
-  
+
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
           <p className="text-sm text-gray-500 font-medium">Loading...</p>
@@ -213,19 +212,20 @@ export default function CustomerForm({
   }
   if (!user) return null;
   return (
-    <div className="flex min-h-screen bg-gray-100 font-sans text-gray-700">
-      <Navbar   />
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-100 font-sans text-gray-700">
+      <Navbar />
 
-      <main className="flex-1 pt-14 overflow-y-auto">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-semibold text-gray-800">
+      <main className="flex-1 pt-14 overflow-y-auto w-full">
+        <div className="px-4 py-4 sm:p-6 max-w-7xl mx-auto w-full">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+              <h1 className="text-xl sm:text-2xl font-semibold text-gray-800">
                 {mode === "edit" ? "Edit Customer" : "New Customer"}
               </h1>
               <Link
                 href="/customer"
-                className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-sm text-sm font-medium transition-colors shadow-sm"
+                className="inline-flex items-center justify-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-sm text-sm font-medium transition-colors shadow-sm w-full sm:w-auto"
               >
                 <List size={16} />
                 Customer List
@@ -262,7 +262,7 @@ export default function CustomerForm({
                     <Minus size={14}/>
                   </div>
                 </div>
-                <div className="p-4 grid grid-cols-2 gap-4">
+                <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-bold block mb-1 uppercase text-gray-500">ID</label>
                     <input
@@ -276,7 +276,7 @@ export default function CustomerForm({
                     <label className="text-xs font-bold block mb-1 uppercase text-gray-500">Third Party Type</label>
                     <select className="w-full border p-2 text-sm rounded outline-none"><option>Customer</option></select>
                   </div>
-                  <div className="col-span-2">
+                  <div className="sm:col-span-2">
                     <label className="text-xs font-bold block mb-1 uppercase text-gray-500">Name</label>
                     <input name="name" value={formData.name} onChange={handleInputChange} placeholder="Name Enter" className="w-full border p-2 text-sm rounded outline-none focus:border-blue-500" />
                   </div>
@@ -352,7 +352,7 @@ export default function CustomerForm({
                       <input name={field.n} value={formData[field.n as keyof typeof formData] as string} onChange={handleInputChange} placeholder={`${field.l} Enter`} className="w-full border p-2 text-sm rounded outline-none" />
                     </div>
                   ))}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div><label className="text-xs font-bold block mb-1 uppercase text-gray-500">City</label><input name="city" value={formData.city} onChange={handleInputChange} placeholder="City Enter" className="w-full border p-2 text-sm rounded outline-none" /></div>
                     <div><label className="text-xs font-bold block mb-1 uppercase text-gray-500">Country</label><input name="country" value={formData.country} onChange={handleInputChange} placeholder="Country Enter" className="w-full border p-2 text-sm rounded outline-none" /></div>
                   </div>
@@ -366,7 +366,7 @@ export default function CustomerForm({
                 <span>Other Information</span>
                 <Minus size={14}/>
               </div>
-              <div className="p-4 grid grid-cols-2 gap-4">
+              <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-bold block mb-1 uppercase text-gray-500">
                     VAT Number <span className="text-red-500">*</span>
@@ -421,15 +421,15 @@ export default function CustomerForm({
               </div>
             )}
 
-            <div className="bg-white p-4 border rounded shadow-sm flex items-center gap-3">
-              <button 
-                onClick={handleSave} 
+            <div className="bg-white p-4 border rounded shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <button
+                onClick={handleSave}
                 disabled={isSaving}
-                className={`bg-blue-600 text-white px-10 py-2 rounded text-sm font-bold shadow-md transition-all ${isSaving ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700 active:scale-95'}`}
+                className={`bg-blue-600 text-white px-10 py-2 rounded text-sm font-bold shadow-md transition-all w-full sm:w-auto ${isSaving ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700 active:scale-95'}`}
               >
                 {isSaving ? "Saving..." : mode === "edit" ? "Update Customer" : "Save Customer"}
               </button>
-              <button onClick={() => router.push("/customer")} className="bg-gray-500 text-white px-6 py-2 rounded text-sm font-bold hover:bg-gray-600">
+              <button onClick={() => router.push("/customer")} className="bg-gray-500 text-white px-6 py-2 rounded text-sm font-bold hover:bg-gray-600 w-full sm:w-auto">
                 Cancel
               </button>
             </div>
