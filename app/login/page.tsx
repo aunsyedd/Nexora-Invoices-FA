@@ -248,7 +248,7 @@ function LoginForm() {
               Version 1.0
             </div>
             <p className="text-xs text-gray-400">
-              Engineered by{" "}
+              Engineered & Developed by{" "}
               <a
                 href="https://www.nexoratech.info/"
                 target="_blank"
