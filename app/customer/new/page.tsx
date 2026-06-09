@@ -13,6 +13,7 @@ interface CustomerFormProps {
   customerId?: string;
   initialCustomer?: Record<string, unknown> | null;
 }
+
 const initialState = {
   name: "",
   alias_name: "",
@@ -50,9 +51,8 @@ export default function CustomerForm({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [formData, setFormData] = useState(initialState);
 
+  // ✅ FIX: Removed `user` from dependency array to prevent form reset on auth re-fires
   useEffect(() => {
-    if (!user) return;
-
     if (mode === "edit" && initialCustomer) {
       setFormData({
         name: String(initialCustomer.name ?? ""),
@@ -61,7 +61,7 @@ export default function CustomerForm({
         phone: String(initialCustomer.phone ?? ""),
         email: String(initialCustomer.email ?? ""),
         website: String(initialCustomer.website ?? ""),
-        building_no: String(initialCustomer.building_no ?? ""),
+   building_no: initialCustomer.building_no ? String(initialCustomer.building_no) : "",
         street: String(initialCustomer.street ?? ""),
         district: String(initialCustomer.district ?? ""),
         second_no: String(initialCustomer.second_no ?? ""),
@@ -78,7 +78,7 @@ export default function CustomerForm({
         setPreviewUrl(String(initialCustomer.image_url));
       }
     }
-  }, [mode, initialCustomer, user]);
+  }, [mode, initialCustomer]); // ✅ `user` removed — was causing form to reset on every auth tick
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -181,6 +181,7 @@ export default function CustomerForm({
         setTimeout(() => router.push("/customer"), 1200);
         return;
       }
+
       const { error } = await supabase
         .from("customers2")
         .insert([payload]);
@@ -210,7 +211,9 @@ export default function CustomerForm({
       </div>
     );
   }
+
   if (!user) return null;
+
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-100 font-sans text-gray-700">
       <Navbar />
@@ -247,24 +250,30 @@ export default function CustomerForm({
                   <span className="font-medium">General Information</span>
                   <div className="flex gap-2 items-center text-[10px]">
                     {mode === "edit" && customerId && (
-                      <span className="bg-white/20 px-2 py-0.5 rounded">ID: {customerId}</span>
+                      <span className="bg-white/20 px-2 py-0.5 rounded">
+                        ID: {customerId}
+                      </span>
                     )}
                     <button
                       type="button"
                       onClick={toggleActive}
                       className={`px-2 py-0.5 rounded transition-colors ${
-                        formData.active ? "bg-green-500 hover:bg-green-600" : "bg-gray-500 hover:bg-gray-600"
+                        formData.active
+                          ? "bg-green-500 hover:bg-green-600"
+                          : "bg-gray-500 hover:bg-gray-600"
                       }`}
                       title="Click to toggle status"
                     >
                       {formData.active ? "Active" : "Inactive"}
                     </button>
-                    <Minus size={14}/>
+                    <Minus size={14} />
                   </div>
                 </div>
                 <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs font-bold block mb-1 uppercase text-gray-500">ID</label>
+                    <label className="text-xs font-bold block mb-1 uppercase text-gray-500">
+                      ID
+                    </label>
                     <input
                       disabled
                       value={mode === "edit" && customerId ? customerId : ""}
@@ -273,12 +282,24 @@ export default function CustomerForm({
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-bold block mb-1 uppercase text-gray-500">Third Party Type</label>
-                    <select className="w-full border p-2 text-sm rounded outline-none"><option>Customer</option></select>
+                    <label className="text-xs font-bold block mb-1 uppercase text-gray-500">
+                      Third Party Type
+                    </label>
+                    <select className="w-full border p-2 text-sm rounded outline-none">
+                      <option>Customer</option>
+                    </select>
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="text-xs font-bold block mb-1 uppercase text-gray-500">Name</label>
-                    <input name="name" value={formData.name} onChange={handleInputChange} placeholder="Name Enter" className="w-full border p-2 text-sm rounded outline-none focus:border-blue-500" />
+                    <label className="text-xs font-bold block mb-1 uppercase text-gray-500">
+                      Name
+                    </label>
+                    <input
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      placeholder="Name Enter"
+                      className="w-full border p-2 text-sm rounded outline-none focus:border-blue-500"
+                    />
                   </div>
                 </div>
               </div>
@@ -288,15 +309,40 @@ export default function CustomerForm({
                 <div className="bg-blue-600 text-white p-2 px-4 flex justify-between items-center text-sm">
                   <span className="font-medium">Picture</span>
                   <div className="flex gap-1">
-                    <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept="image/*" className="hidden" />
-                    <button type="button" onClick={() => fileInputRef.current?.click()} className="bg-green-600 p-1 rounded hover:bg-green-700"><Upload size={14}/></button>
-                    <button type="button" onClick={() => {setPreviewUrl(null); if(fileInputRef.current) fileInputRef.current.value="";}} className="bg-red-600 p-1 rounded hover:bg-red-700"><Trash2 size={14}/></button>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileSelect}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="bg-green-600 p-1 rounded hover:bg-green-700"
+                    >
+                      <Upload size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPreviewUrl(null);
+                        if (fileInputRef.current) fileInputRef.current.value = "";
+                      }}
+                      className="bg-red-600 p-1 rounded hover:bg-red-700"
+                    >
+                      <Trash2 size={14} />
+                    </button>
                   </div>
                 </div>
                 <div className="p-6 flex justify-center">
                   <div className="w-32 h-40 bg-gray-50 border-2 border-dashed rounded overflow-hidden flex flex-col items-center justify-center text-gray-400">
                     {previewUrl ? (
-                      <img src={previewUrl} className="w-full h-full object-cover" alt="Preview" />
+                      <img
+                        src={previewUrl}
+                        className="w-full h-full object-cover"
+                        alt="Preview"
+                      />
                     ) : (
                       <>
                         <Users size={40} strokeWidth={1} />
@@ -314,7 +360,7 @@ export default function CustomerForm({
               <div className="bg-white rounded border border-gray-200 shadow-sm">
                 <div className="bg-blue-600 text-white p-2 px-4 flex justify-between items-center text-sm font-medium">
                   <span>Contact Information</span>
-                  <Minus size={14}/>
+                  <Minus size={14} />
                 </div>
                 <div className="p-4 space-y-3">
                   {[
@@ -323,11 +369,21 @@ export default function CustomerForm({
                     { l: "Mobile Number", n: "mobile" },
                     { l: "Phone Number", n: "phone" },
                     { l: "Email Address", n: "email" },
-                    { l: "Website", n: "website" }
-                  ].map(field => (
+                    { l: "Website", n: "website" },
+                  ].map((field) => (
                     <div key={field.n}>
-                      <label className="text-xs font-bold block mb-1 uppercase text-gray-500">{field.l}</label>
-                      <input name={field.n} value={formData[field.n as keyof typeof formData] as string} onChange={handleInputChange} placeholder={`${field.l} Enter`} className="w-full border p-2 text-sm rounded outline-none" />
+                      <label className="text-xs font-bold block mb-1 uppercase text-gray-500">
+                        {field.l}
+                      </label>
+                      <input
+                        name={field.n}
+                        value={
+                          formData[field.n as keyof typeof formData] as string
+                        }
+                        onChange={handleInputChange}
+                        placeholder={`${field.l} Enter`}
+                        className="w-full border p-2 text-sm rounded outline-none"
+                      />
                     </div>
                   ))}
                 </div>
@@ -337,7 +393,7 @@ export default function CustomerForm({
               <div className="bg-white rounded border border-gray-200 shadow-sm">
                 <div className="bg-blue-600 text-white p-2 px-4 flex justify-between items-center text-sm font-medium">
                   <span>National Address</span>
-                  <Minus size={14}/>
+                  <Minus size={14} />
                 </div>
                 <div className="p-4 space-y-3">
                   {[
@@ -345,16 +401,48 @@ export default function CustomerForm({
                     { l: "Street Name", n: "street" },
                     { l: "District Name", n: "district" },
                     { l: "Second Number", n: "second_no" },
-                    { l: "Postal Code", n: "postal_code" }
-                  ].map(field => (
+                    { l: "Postal Code", n: "postal_code" },
+                  ].map((field) => (
                     <div key={field.n}>
-                      <label className="text-xs font-bold block mb-1 uppercase text-gray-500">{field.l}</label>
-                      <input name={field.n} value={formData[field.n as keyof typeof formData] as string} onChange={handleInputChange} placeholder={`${field.l} Enter`} className="w-full border p-2 text-sm rounded outline-none" />
+                      <label className="text-xs font-bold block mb-1 uppercase text-gray-500">
+                        {field.l}
+                      </label>
+                      <input
+                        name={field.n}
+                        value={
+                          formData[field.n as keyof typeof formData] as string
+                        }
+                        onChange={handleInputChange}
+                        placeholder={`${field.l} Enter`}
+                        className="w-full border p-2 text-sm rounded outline-none"
+                      />
                     </div>
                   ))}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div><label className="text-xs font-bold block mb-1 uppercase text-gray-500">City</label><input name="city" value={formData.city} onChange={handleInputChange} placeholder="City Enter" className="w-full border p-2 text-sm rounded outline-none" /></div>
-                    <div><label className="text-xs font-bold block mb-1 uppercase text-gray-500">Country</label><input name="country" value={formData.country} onChange={handleInputChange} placeholder="Country Enter" className="w-full border p-2 text-sm rounded outline-none" /></div>
+                    <div>
+                      <label className="text-xs font-bold block mb-1 uppercase text-gray-500">
+                        City
+                      </label>
+                      <input
+                        name="city"
+                        value={formData.city}
+                        onChange={handleInputChange}
+                        placeholder="City Enter"
+                        className="w-full border p-2 text-sm rounded outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold block mb-1 uppercase text-gray-500">
+                        Country
+                      </label>
+                      <input
+                        name="country"
+                        value={formData.country}
+                        onChange={handleInputChange}
+                        placeholder="Country Enter"
+                        className="w-full border p-2 text-sm rounded outline-none"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -364,13 +452,15 @@ export default function CustomerForm({
             <div className="bg-white rounded border border-gray-200 shadow-sm overflow-hidden">
               <div className="bg-blue-600 text-white p-2 px-4 flex justify-between items-center text-sm font-medium">
                 <span>Other Information</span>
-                <Minus size={14}/>
+                <Minus size={14} />
               </div>
               <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-bold block mb-1 uppercase text-gray-500">
                     VAT Number <span className="text-red-500">*</span>
-                    <span className="ml-2 normal-case font-normal text-gray-400">(exactly 15 digits)</span>
+                    <span className="ml-2 normal-case font-normal text-gray-400">
+                      (exactly 15 digits)
+                    </span>
                   </label>
                   <input
                     name="vat_no"
@@ -406,30 +496,55 @@ export default function CustomerForm({
                     </span>
                   </div>
                 </div>
-                <div><label className="text-xs font-bold block mb-1 uppercase text-gray-500">Other ID</label><input name="other_id" value={formData.other_id} onChange={handleInputChange} placeholder="Other ID Enter" className="w-full border p-2 text-sm rounded outline-none" /></div>
+                <div>
+                  <label className="text-xs font-bold block mb-1 uppercase text-gray-500">
+                    Other ID
+                  </label>
+                  <input
+                    name="other_id"
+                    value={formData.other_id}
+                    onChange={handleInputChange}
+                    placeholder="Other ID Enter"
+                    className="w-full border p-2 text-sm rounded outline-none"
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Action Buttons */}
+            {/* Status Message */}
             {statusMsg && (
-              <div className={`text-sm font-medium px-4 py-3 rounded border ${
-                statusType === "error"
-                  ? "bg-red-50 text-red-700 border-red-200"
-                  : "bg-green-50 text-green-700 border-green-200"
-              }`}>
+              <div
+                className={`text-sm font-medium px-4 py-3 rounded border ${
+                  statusType === "error"
+                    ? "bg-red-50 text-red-700 border-red-200"
+                    : "bg-green-50 text-green-700 border-green-200"
+                }`}
+              >
                 {statusMsg}
               </div>
             )}
 
+            {/* Action Buttons */}
             <div className="bg-white p-4 border rounded shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className={`bg-blue-600 text-white px-10 py-2 rounded text-sm font-bold shadow-md transition-all w-full sm:w-auto ${isSaving ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700 active:scale-95'}`}
+                className={`bg-blue-600 text-white px-10 py-2 rounded text-sm font-bold shadow-md transition-all w-full sm:w-auto ${
+                  isSaving
+                    ? "opacity-50 cursor-not-allowed"
+                    : "hover:bg-blue-700 active:scale-95"
+                }`}
               >
-                {isSaving ? "Saving..." : mode === "edit" ? "Update Customer" : "Save Customer"}
+                {isSaving
+                  ? "Saving..."
+                  : mode === "edit"
+                  ? "Update Customer"
+                  : "Save Customer"}
               </button>
-              <button onClick={() => router.push("/customer")} className="bg-gray-500 text-white px-6 py-2 rounded text-sm font-bold hover:bg-gray-600 w-full sm:w-auto">
+              <button
+                onClick={() => router.push("/customer")}
+                className="bg-gray-500 text-white px-6 py-2 rounded text-sm font-bold hover:bg-gray-600 w-full sm:w-auto"
+              >
                 Cancel
               </button>
             </div>
